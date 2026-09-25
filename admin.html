@@ -73,7 +73,7 @@ textarea{width:100%; background:#120d0d; border:1px solid var(--border); color:v
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyfXDzfGo68lscg5T7FkbvA01op4v7I35MTv1SYBZtbKq9i3loBH-a4SbxVteRsFomK/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbytOeGdqvbwoXG9GEHVQ0mPiChe3BreVBCnz9E7lrSY99T_rkzf2dRyXuR8PgUe5SIl/exec";
 
 // ===== ตัวช่วยเรียก backend แบบมี timeout กันหน้าค้าง =====
 async function apiFetch(url, options){
@@ -152,10 +152,21 @@ async function loadResults(){
   }catch(e){ top.textContent = "เชื่อมต่อไม่สำเร็จ"; }
 }
 async function loadGhostsAdmin(){
-  const res = await apiFetch(API_URL + "?action=ghosts");
-  const data = await res.json();
-  ghostsCache = data.ghosts || [];
   const box = document.getElementById("ghostAdminList");
+  box.innerHTML = "กำลังโหลด…";
+  let data;
+  try{
+    const res = await apiFetch(API_URL + "?action=ghosts");
+    data = await res.json();
+  }catch(e){
+    box.innerHTML = '<div style="color:#c98">โหลดรายการผีไม่สำเร็จ <button class="smallbtn" onclick="loadGhostsAdmin()">ลองใหม่</button></div>';
+    return;
+  }
+  if(!data || !data.ok || !data.ghosts){
+    box.innerHTML = '<div style="color:#c98">ไม่พบข้อมูลผี (ตรวจว่า Deploy backend เวอร์ชันล่าสุดแล้ว) <button class="smallbtn" onclick="loadGhostsAdmin()">ลองใหม่</button></div>';
+    return;
+  }
+  ghostsCache = data.ghosts || [];
   box.innerHTML = ghostsCache.map(gh => `
     <div class="ghostRow">
       <div class="thumb" id="thumb-${gh.ghostId}" style="${gh.imageUrl?`background-image:url('${gh.imageUrl}')`:""}">${gh.imageUrl?"":"👻"}</div>
