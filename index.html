@@ -257,7 +257,7 @@ body.intro-lock{overflow:hidden;}
   <div class="navlinks">
     <a href="#ghosts">โหวต</a><a href="#about">เกี่ยวกับกิจกรรม</a><a href="#rules">กติกา</a><a href="#contact">ติดต่อเรา</a>
   </div>
-  <button class="adminbtn soundbtn" id="soundBtn" onclick="toggleSound()" title="เสียงบรรยากาศ">🔇 เสียง</button>
+  <button class="adminbtn soundbtn" id="soundBtn" onclick="toggleSound()" title="เพลงประกอบ">🔇 เพลง</button>
   <button class="adminbtn" onclick="openAdmin()">สำหรับแอดมิน ⚙</button>
 </div></nav>
 
@@ -658,35 +658,24 @@ function endIntro(){
   window.addEventListener('scroll', onScroll, {passive:true});
 })();
 
-/* ===== เสียงบรรยากาศหลอนๆ (สังเคราะห์ลมหวีดด้วย WebAudio ไม่ต้องมีไฟล์เสียง) ===== */
-let audioCtx=null, windGain=null, soundOn=false;
-function buildWind(){
-  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  // noise buffer
-  const bufSize = audioCtx.sampleRate*2;
-  const buffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i=0;i<bufSize;i++) data[i] = Math.random()*2-1;
-  const noise = audioCtx.createBufferSource();
-  noise.buffer = buffer; noise.loop = true;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = "lowpass"; filter.frequency.value = 480;
-  windGain = audioCtx.createGain(); windGain.gain.value = 0;
-  noise.connect(filter); filter.connect(windGain); windGain.connect(audioCtx.destination);
-  noise.start();
-  // แกว่งความดังช้าๆ ให้เหมือนลมหวีดเป็นช่วงๆ
-  const lfo = audioCtx.createOscillator();
-  const lfoGain = audioCtx.createGain();
-  lfo.frequency.value = 0.08; lfoGain.gain.value = 0.06;
-  lfo.connect(lfoGain); lfoGain.connect(windGain.gain); lfo.start();
-}
+/* ===== เพลงประกอบหลอนๆ (ไฟล์เพลง .m4a เล่นวนลูป กดเปิด/ปิด) ===== */
+let bgm=null, soundOn=false;
 function toggleSound(){
   const btn = document.getElementById("soundBtn");
-  if(!audioCtx) buildWind();
-  if(audioCtx.state === "suspended") audioCtx.resume();
-  soundOn = !soundOn;
-  windGain.gain.setTargetAtTime(soundOn?0.10:0, audioCtx.currentTime, 0.6);
-  btn.textContent = soundOn ? "🔊 เสียง" : "🔇 เสียง";
+  if(!bgm){
+    bgm = new Audio("assets/bgm.m4a");
+    bgm.loop = true; bgm.volume = 0.55;
+  }
+  if(soundOn){
+    bgm.pause();
+    soundOn = false;
+    btn.textContent = "🔇 เพลง";
+  } else {
+    const p = bgm.play();
+    if(p && p.catch) p.catch(()=>{});
+    soundOn = true;
+    btn.textContent = "🔊 เพลง";
+  }
 }
 renderGrid();
 loadGhosts();
