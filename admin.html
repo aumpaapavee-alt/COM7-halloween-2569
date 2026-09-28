@@ -38,6 +38,20 @@ textarea{width:100%; background:#120d0d; border:1px solid var(--border); color:v
   background:linear-gradient(180deg,var(--blood-bright),var(--blood)); color:#fff; cursor:pointer}
 .smallbtn.delbtn{background:transparent; border:1px solid #6a2a2a; color:#c98; margin-left:8px}
 .smallbtn.delbtn:hover{border-color:var(--blood-bright); color:#fdd}
+
+/* ===== admin tabs & bar ===== */
+.adminbar{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:12px}
+.tabs{display:flex; gap:8px}
+.tab{background:transparent; border:1px solid var(--border); color:var(--dim); padding:9px 16px; border-radius:9px 9px 0 0; font-family:'Mitr'; font-size:14px; cursor:pointer}
+.tab.active{background:linear-gradient(180deg,var(--blood-bright),var(--blood)); color:#fff; border-color:transparent; font-weight:600}
+.adminbar-right{display:flex; gap:8px}
+.linkbtn{background:transparent; border:1px solid var(--border); color:var(--dim); padding:8px 14px; border-radius:20px; font-family:'Mitr'; font-size:13px; cursor:pointer}
+.linkbtn:hover{border-color:var(--blood-bright); color:var(--fog)}
+.linkbtn.logout{border-color:#6a2a2a; color:#c98}
+.schedbox{border:1px solid var(--border); border-radius:12px; padding:16px; background:#120d0d; margin:12px 0}
+.schedrow{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:12px}
+.schedrow>div{flex:1; min-width:180px}
+.togglerow{display:flex; gap:10px; margin:8px 0 4px}
 </style>
 </head>
 <body>
@@ -51,30 +65,68 @@ textarea{width:100%; background:#120d0d; border:1px solid var(--border); color:v
 </div>
 
 <div class="box wide hide" id="panelBox">
-  <h1>แผงควบคุมการโหวต</h1>
-  <div class="status" id="curStatus">กำลังโหลดสถานะ…</div>
-  <label>วัน-เวลาปิดโหวต</label>
-  <input type="datetime-local" id="endTime">
-  <button class="btn primary" onclick="saveEndTime()">บันทึกเวลาปิดโหวต</button>
-  <button class="btn toggle-open" id="openBtn" onclick="setStatus(true)">เปิดรับโหวต</button>
-  <button class="btn toggle-close" id="closeBtn" onclick="setStatus(false)">ปิดรับโหวต</button>
-  <div class="msg">หมายเหตุ: ระบบไม่แสดงผลคะแนนรายผี เพื่อใช้สุ่มรายชื่อผู้โชคดีจากผู้ที่โหวตให้ผีอันดับ 1 เท่านั้น</div>
-
-  <h2>ผลโหวตตอนนี้ (เฉพาะแอดมิน)</h2>
-  <div id="resultBox" style="border:1px solid var(--border); border-radius:12px; padding:18px; background:#120d0d">
-    <div id="resultTop" style="font-size:15px; color:var(--fog)">กำลังโหลด…</div>
-    <div id="resultTotal" style="font-size:12.5px; color:var(--dim); margin-top:6px"></div>
-    <button class="smallbtn" style="margin-top:12px" onclick="loadResults()">รีเฟรชผลโหวต</button>
-    <div id="resultAll" style="margin-top:14px; font-size:12.5px; color:var(--dim)"></div>
+  <div class="adminbar">
+    <div class="tabs">
+      <button class="tab active" id="tab1btn" onclick="showTab(1)">⚙ ตั้งค่าโหวต &amp; จัดการผี</button>
+      <button class="tab" id="tab2btn" onclick="showTab(2)">🏆 ดูผลโหวต</button>
+    </div>
+    <div class="adminbar-right">
+      <button class="linkbtn" onclick="window.open('index.html','_blank')">🏠 หน้าโหวต</button>
+      <button class="linkbtn logout" onclick="logout()">ออกจากระบบ ⎋</button>
+    </div>
   </div>
 
-  <h2>รูปภาพและตำนานผีแต่ละตัว</h2>
-  <div id="ghostAdminList">กำลังโหลด…</div>
+  <!-- ===== หน้า 1: ตั้งค่าโหวต + จัดการผี ===== -->
+  <div id="tab1">
+    <h1>แผงควบคุมการโหวต</h1>
+    <div class="status" id="curStatus">กำลังโหลดสถานะ…</div>
+
+    <div class="schedbox">
+      <div class="schedrow">
+        <div>
+          <label>วัน-เวลา<b>เริ่ม</b>เปิดโหวต</label>
+          <input type="datetime-local" id="startTime">
+        </div>
+        <div>
+          <label>วัน-เวลา<b>ปิด</b>โหวต</label>
+          <input type="datetime-local" id="endTime">
+        </div>
+      </div>
+      <button class="btn primary" onclick="saveSchedule()">บันทึกช่วงเวลาโหวต</button>
+      <div class="msg" style="margin-top:8px">* ตั้งช่วงวันเปิด–ปิด แล้วต้องกด "เปิดรับโหวต" ด้วย ระบบจะเปิดให้โหวตเฉพาะภายในช่วงเวลานี้</div>
+    </div>
+
+    <div class="togglerow">
+      <button class="btn toggle-open" id="openBtn" onclick="setStatus(true)">เปิดรับโหวต</button>
+      <button class="btn toggle-close" id="closeBtn" onclick="setStatus(false)">ปิดรับโหวต</button>
+    </div>
+
+    <h2>รูปภาพและตำนานผีแต่ละตัว</h2>
+    <div id="ghostAdminList">กำลังโหลด…</div>
+  </div>
+
+  <!-- ===== หน้า 2: ดูผลโหวต ===== -->
+  <div id="tab2" style="display:none">
+    <h1>ผลโหวตตอนนี้ (เฉพาะแอดมิน)</h1>
+    <div class="msg" style="margin-bottom:14px">หมายเหตุ: หน้านี้เห็นเฉพาะแอดมิน — ระบบไม่แสดงคะแนนบนหน้าเว็บพนักงาน เพื่อใช้สุ่มผู้โชคดีจากผีอันดับ 1</div>
+    <div id="resultBox" style="border:1px solid var(--border); border-radius:12px; padding:22px; background:#120d0d">
+      <div id="resultTop" style="font-size:20px; color:var(--fog)">กำลังโหลด…</div>
+      <div id="resultTotal" style="font-size:13px; color:var(--dim); margin-top:8px"></div>
+      <button class="btn primary" style="margin-top:16px; width:auto; padding:9px 20px" onclick="loadResults()">🔄 รีเฟรชผลโหวต</button>
+      <div id="resultAll" style="margin-top:18px; font-size:13.5px; color:var(--fog)"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbytOeGdqvbwoXG9GEHVQ0mPiChe3BreVBCnz9E7lrSY99T_rkzf2dRyXuR8PgUe5SIl/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxCx5c1rEwKOnBfc0xbkqcz4yYeOfjmO_vOjyM5b7oyfkBSCulBlTFFLItnyPB-w9v7/exec";
 
+function driveImg(url){
+  if(!url) return "";
+  var m = url.match(/[-\w]{25,}/);
+  if(m) return "https://drive.google.com/thumbnail?id=" + m[0] + "&sz=w1000";
+  return url;
+}
 // ===== ตัวช่วยเรียก backend แบบมี timeout กันหน้าค้าง =====
 async function apiFetch(url, options){
   options = options || {};
@@ -111,26 +163,54 @@ async function login(){
   }catch(e){ msg.textContent = "เชื่อมต่อไม่สำเร็จ"; }
 }
 
+function toLocalInput(iso){
+  // แปลง ISO -> ค่าใส่ใน datetime-local (เวลาท้องถิ่น)
+  const d = new Date(iso);
+  const off = d.getTimezoneOffset()*60000;
+  return new Date(d - off).toISOString().slice(0,16);
+}
 async function loadStatus(){
-  const res = await apiFetch(API_URL + "?action=status");
-  const data = await res.json();
-  document.getElementById("curStatus").textContent =
-    data.open ? "สถานะปัจจุบัน: เปิดรับโหวต" : "สถานะปัจจุบัน: ปิดรับโหวต";
-  if(data.endTime){
-    const local = new Date(data.endTime);
-    document.getElementById("endTime").value = local.toISOString().slice(0,16);
-  }
+  let data;
+  try{
+    const res = await apiFetch(API_URL + "?action=status");
+    data = await res.json();
+  }catch(e){ document.getElementById("curStatus").textContent = "โหลดสถานะไม่สำเร็จ"; return; }
+  const st = document.getElementById("curStatus");
+  let txt = data.open ? "🟢 สถานะ: เปิดรับโหวต" : "🔴 สถานะ: ปิดรับโหวต";
+  if(data.startTime) txt += "  |  เริ่ม: " + new Date(data.startTime).toLocaleString("th-TH");
+  if(data.endTime) txt += "  |  ปิด: " + new Date(data.endTime).toLocaleString("th-TH");
+  st.textContent = txt;
+  if(data.startTime) document.getElementById("startTime").value = toLocalInput(data.startTime);
+  if(data.endTime) document.getElementById("endTime").value = toLocalInput(data.endTime);
 }
 
 async function setStatus(open){
   await apiFetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({action:"setStatus", password: adminPassword, open})});
   loadStatus();
 }
-async function saveEndTime(){
-  const val = document.getElementById("endTime").value;
-  if(!val) return;
-  await apiFetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({action:"setEndTime", password: adminPassword, endTime: new Date(val).toISOString()})});
+async function saveSchedule(){
+  const s = document.getElementById("startTime").value;
+  const en = document.getElementById("endTime").value;
+  const body = {action:"setSchedule", password: adminPassword};
+  body.startTime = s ? new Date(s).toISOString() : "";
+  body.endTime = en ? new Date(en).toISOString() : "";
+  await apiFetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(body)});
+  alert("บันทึกช่วงเวลาโหวตแล้ว");
   loadStatus();
+}
+function showTab(n){
+  document.getElementById("tab1").style.display = n===1 ? "block" : "none";
+  document.getElementById("tab2").style.display = n===2 ? "block" : "none";
+  document.getElementById("tab1btn").classList.toggle("active", n===1);
+  document.getElementById("tab2btn").classList.toggle("active", n===2);
+  if(n===2) loadResults();
+}
+function logout(){
+  adminPassword = "";
+  document.getElementById("panelBox").classList.add("hide");
+  document.getElementById("loginBox").classList.remove("hide");
+  document.getElementById("pw").value = "";
+  document.getElementById("loginMsg").textContent = "";
 }
 
 let ghostsCache = [];
@@ -169,7 +249,7 @@ async function loadGhostsAdmin(){
   ghostsCache = data.ghosts || [];
   box.innerHTML = ghostsCache.map(gh => `
     <div class="ghostRow">
-      <div class="thumb" id="thumb-${gh.ghostId}" style="${gh.imageUrl?`background-image:url('${gh.imageUrl}')`:""}">${gh.imageUrl?"":"👻"}</div>
+      <div class="thumb" id="thumb-${gh.ghostId}">${gh.imageUrl?`<img src="${driveImg(gh.imageUrl)}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;border-radius:6px" alt="">`:"👻"}</div>
       <div>
         <input id="name-${gh.ghostId}" value="${(gh.name||'').replace(/"/g,'&quot;')}" placeholder="ชื่อผี" style="font-weight:600; margin-bottom:6px">
         <input type="file" accept="image/*" id="file-${gh.ghostId}">

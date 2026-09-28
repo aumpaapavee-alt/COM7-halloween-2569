@@ -149,6 +149,7 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
   background:radial-gradient(circle at 50% 40%, rgba(194,42,42,.22), transparent 60%);
   transition:opacity .3s}
 .card:hover::after{opacity:1}
+.card .cardimg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0}
 .card .num{position:absolute; top:12px; left:14px; font-family:'Mitr'; font-weight:700;
   font-size:14px; color:var(--blood-bright); text-shadow:0 0 8px rgba(0,0,0,.85); z-index:2}
 .card .noimg{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
@@ -353,7 +354,7 @@ body.intro-lock{overflow:hidden;}
 
 <script>
 /* ====== ตั้งค่า endpoint ของ Google Apps Script Web App ที่นี่ ====== */
-const API_URL = "https://script.google.com/macros/s/AKfycbytOeGdqvbwoXG9GEHVQ0mPiChe3BreVBCnz9E7lrSY99T_rkzf2dRyXuR8PgUe5SIl/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxCx5c1rEwKOnBfc0xbkqcz4yYeOfjmO_vOjyM5b7oyfkBSCulBlTFFLItnyPB-w9v7/exec";
 
 // ===== ตัวช่วยเรียก backend แบบมี timeout กันหน้าค้าง =====
 async function apiFetch(url, options){
@@ -393,6 +394,13 @@ const GHOSTS = [
   legend:"วิญญาณร้ายที่แฝงตัวเข้าสิงร่างคนธรรมดาในหมู่บ้าน กินเครื่องในสดเป็นอาหารยามค่ำคืนโดยเจ้าของร่างไม่รู้ตัว หมู่บ้านที่มีปอบสิงมักพบศพผู้เสียชีวิตอย่างประหลาดต่อเนื่องหลายราย"},
 ];
 
+// แปลงลิงก์รูป Google Drive ให้เป็นรูปแบบที่ฝังโชว์ได้ชัวร์ (thumbnail)
+function driveImg(url){
+  if(!url) return "";
+  var m = url.match(/[-\w]{25,}/);           // ดึง file id จากลิงก์รูปแบบใดก็ได้
+  if(m) return "https://drive.google.com/thumbnail?id=" + m[0] + "&sz=w1000";
+  return url;                                  // ไม่ใช่ลิงก์ Drive (เช่น assets/..) ใช้ตามเดิม
+}
 let selectedGhost = null;
 let voteStatus = {open:false, endTime:null};
 let countdownTimer = null;
@@ -418,10 +426,9 @@ function spawnEmbers(){
 function renderGrid(){
   const g = document.getElementById("ghostGrid");
   g.innerHTML = GHOSTS.map((gh,i) => `
-    <div class="card" id="card-${gh.id}" onclick="openLegend('${gh.id}')"
-      style="${gh.imageUrl ? `background-image:url('${gh.imageUrl}')` : ""}">
+    <div class="card" id="card-${gh.id}" onclick="openLegend('${gh.id}')">
+      ${gh.imageUrl ? `<img class="cardimg" src="${driveImg(gh.imageUrl)}" referrerpolicy="no-referrer" alt="" onerror="this.style.display='none'">` : `<div class="noimg">${gh.glyph}</div>`}
       <div class="num">${String(i+1).padStart(2,"0")}</div>
-      ${gh.imageUrl ? "" : `<div class="noimg">${gh.glyph}</div>`}
       <div class="overlay-grad"></div>
       <div class="info">
         <h3>${gh.name}</h3>
@@ -454,7 +461,7 @@ async function loadGhosts(){
 
 function openLegend(id){
   const gh = GHOSTS.find(x=>x.id===id);
-  document.getElementById("lgImg").style.backgroundImage = gh.imageUrl ? `url('${gh.imageUrl}')` : "none";
+  document.getElementById("lgImg").innerHTML = gh.imageUrl ? `<img src="${driveImg(gh.imageUrl)}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:contain" alt="">` : "";
   document.getElementById("lgName").textContent = gh.name;
   document.getElementById("lgSub").textContent = gh.sub;
   document.getElementById("lgText").textContent = gh.legend;
