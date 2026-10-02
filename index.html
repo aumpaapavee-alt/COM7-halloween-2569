@@ -363,7 +363,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxCx5c1rEwKOnBfc0xbkqcz
 async function apiFetch(url, options){
   options = options || {};
   const ctrl = new AbortController();
-  const t = setTimeout(()=>ctrl.abort(), 20000); // 20 วินาที
+  const t = setTimeout(()=>ctrl.abort(), 8000); // 8 วินาที
   try{
     const res = await fetch(url, Object.assign({}, options, {
       signal: ctrl.signal,
@@ -691,10 +691,9 @@ function toggleSound(){
     btn.textContent = "🔊 เพลง";
   }
 }
-// แสดง "กำลังโหลด…" ก่อน แล้วรอ backend ส่งข้อมูลจริงมาค่อย renderGrid()
-// (ไม่โชว์ผีเก่าที่ฝังในโค้ดก่อน เพื่อไม่ให้ค้างรูป/ชื่อเก่าตอนเปิด)
-document.getElementById("ghostGrid").innerHTML =
-  '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:40px 0; font-size:15px">กำลังโหลดผี…</div>';
+// แสดงผีทันที (ไม่ต้องรอ backend = เว็บขึ้นเร็ว ไม่ค้าง "กำลังโหลด")
+// แล้ว loadGhosts() จะดึงข้อมูลล่าสุดมาทับเงียบๆ ภายหลัง (+ cache-buster กันของเก่า + รีเฟรชทุก 10 วิ)
+renderGrid();
 loadGhosts();
 loadStatus();
 setInterval(loadStatus, 10000);
