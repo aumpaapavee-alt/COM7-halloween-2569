@@ -375,7 +375,7 @@ async function apiFetch(url, options){
    เพื่อให้ดูหน้าตา/ทดลองกดได้ทันที โดยไม่ต้องต่อ backend */
 const PREVIEW_MODE = API_URL.includes("XXXXXXXXXXXXXX");
 
-const GHOSTS = [
+let GHOSTS = [
  {id:"krasue", name:"กระสือ", sub:"หญิงสาวร่างท่อนบนลอยได้ กินไส้สด", glyph:"🦇", imageUrl:"assets/krasue.jpg",
   legend:"เมื่อพระอาทิตย์ลับฟ้า หัวและเครื่องในของนางจะลอยออกจากร่างที่ยังหลับใหล ล่องผ่านทุ่งนามืดมิดไปพร้อมแสงเรืองสีเขียวอมฟ้า หากพบซากสัตว์หรือหญิงใกล้คลอด นางจะโฉบลงกินไส้อย่างเงียบเชียบก่อนกลับคืนร่างในยามใกล้รุ่ง"},
  {id:"blackdress", name:"ผีชุดดำ", sub:"วิญญาณหญิงสาวชุดดำตามความแค้น", glyph:"🖤", imageUrl:"assets/blackdress.jpg",
@@ -445,14 +445,19 @@ async function loadGhosts(){
     const res = await apiFetch(API_URL + "?action=ghosts&t=" + Date.now());
     const data = await res.json();
     if(data.ok && data.ghosts){
-      data.ghosts.forEach(remote=>{
-        const local = GHOSTS.find(g=>g.id===remote.ghostId);
-        if(local){
-          if(remote.name) local.name = remote.name;
-          if(remote.imageUrl) local.imageUrl = remote.imageUrl;
-          if(remote.sub) local.sub = remote.sub;
-          if(remote.legend) local.legend = remote.legend;
-        }
+      // สร้างรายการผีใหม่ทั้งหมดจาก backend (เป็นแหล่งข้อมูลหลัก)
+      // -> ผีที่แอดมินเพิ่มใหม่จะโผล่, ผีที่ลบจะหายไป
+      const glyphs = {krasue:"🦇",blackdress:"🖤",pret:"👤",maenak:"🌙",childghost:"🎈",takien:"🌳",phisang:"🌲",pob:"💀"};
+      GHOSTS = data.ghosts.map(r=>{
+        const old = GHOSTS.find(g=>g.id===r.ghostId) || {};
+        return {
+          id: r.ghostId,
+          name: r.name || old.name || "",
+          sub: r.sub || old.sub || "",
+          legend: r.legend || old.legend || "",
+          glyph: old.glyph || glyphs[r.ghostId] || "👻",
+          imageUrl: r.imageUrl || old.imageUrl || ""
+        };
       });
       renderGrid();
     }

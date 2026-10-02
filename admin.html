@@ -172,7 +172,7 @@ function toLocalInput(iso){
 async function loadStatus(){
   let data;
   try{
-    const res = await apiFetch(API_URL + "?action=status");
+    const res = await apiFetch(API_URL + "?action=status&t=" + Date.now());
     data = await res.json();
   }catch(e){ document.getElementById("curStatus").textContent = "โหลดสถานะไม่สำเร็จ"; return; }
   const st = document.getElementById("curStatus");
@@ -236,7 +236,7 @@ async function loadGhostsAdmin(){
   box.innerHTML = "กำลังโหลด…";
   let data;
   try{
-    const res = await apiFetch(API_URL + "?action=ghosts");
+    const res = await apiFetch(API_URL + "?action=ghosts&t=" + Date.now());
     data = await res.json();
   }catch(e){
     box.innerHTML = '<div style="color:#c98">โหลดรายการผีไม่สำเร็จ <button class="smallbtn" onclick="loadGhostsAdmin()">ลองใหม่</button></div>';
