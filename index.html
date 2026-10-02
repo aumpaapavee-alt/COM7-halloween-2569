@@ -2,6 +2,9 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>โหวตผีไทย ที่คุณหลอนมากที่สุด</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👻</text></svg>">
@@ -395,10 +398,13 @@ let GHOSTS = [
 ];
 
 // แปลงลิงก์รูป Google Drive ให้เป็นรูปแบบที่ฝังโชว์ได้ชัวร์ (thumbnail)
+// cache-buster รูป: เปลี่ยนทุกครั้งที่เปิด/รีเฟรชหน้า (รูปใหม่ขึ้นเสมอ ไม่ค้างของเก่า)
+// แต่คงที่ระหว่างเปิดหน้าอยู่ ไม่โหลดรูปซ้ำทุก 10 วิ
+const IMG_CB = Date.now();
 function driveImg(url){
   if(!url) return "";
   var m = url.match(/[-\w]{25,}/);           // ดึง file id จากลิงก์รูปแบบใดก็ได้
-  if(m) return "https://drive.google.com/thumbnail?id=" + m[0] + "&sz=w1000";
+  if(m) return "https://drive.google.com/thumbnail?id=" + m[0] + "&sz=w1000&cb=" + IMG_CB;
   return url;                                  // ไม่ใช่ลิงก์ Drive (เช่น assets/..) ใช้ตามเดิม
 }
 let selectedGhost = null;
@@ -685,8 +691,8 @@ function toggleSound(){
 renderGrid();
 loadGhosts();
 loadStatus();
-setInterval(loadStatus, 60000);
-setInterval(loadGhosts, 60000);
+setInterval(loadStatus, 10000);
+setInterval(loadGhosts, 10000);
 // อัปเดตข้อมูลเมื่อผู้ใช้กลับมาที่แท็บ (เห็นของใหม่ทันทีโดยไม่ต้องรีเฟรช)
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ loadGhosts(); loadStatus(); } });
 </script>
