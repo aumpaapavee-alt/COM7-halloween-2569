@@ -442,7 +442,7 @@ function renderGrid(){
 async function loadGhosts(){
   if(PREVIEW_MODE) return;   // โหมดพรีวิวใช้ข้อมูลในไฟล์
   try{
-    const res = await apiFetch(API_URL + "?action=ghosts");
+    const res = await apiFetch(API_URL + "?action=ghosts&t=" + Date.now());
     const data = await res.json();
     if(data.ok && data.ghosts){
       data.ghosts.forEach(remote=>{
@@ -540,7 +540,7 @@ async function loadStatus(){
     return;
   }
   try{
-    const res = await apiFetch(API_URL + "?action=status");
+    const res = await apiFetch(API_URL + "?action=status&t=" + Date.now());
     voteStatus = await res.json();
   }catch(e){
     voteStatus = {open:false, endTime:null};
@@ -681,6 +681,9 @@ renderGrid();
 loadGhosts();
 loadStatus();
 setInterval(loadStatus, 60000);
+setInterval(loadGhosts, 60000);
+// อัปเดตข้อมูลเมื่อผู้ใช้กลับมาที่แท็บ (เห็นของใหม่ทันทีโดยไม่ต้องรีเฟรช)
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ loadGhosts(); loadStatus(); } });
 </script>
 </body>
 </html>
