@@ -446,7 +446,7 @@ function renderGrid(){
 }
 
 async function loadGhosts(){
-  if(PREVIEW_MODE) return;   // โหมดพรีวิวใช้ข้อมูลในไฟล์
+  if(PREVIEW_MODE){ renderGrid(); return; }   // โหมดพรีวิวใช้ข้อมูลในไฟล์
   try{
     const res = await apiFetch(API_URL + "?action=ghosts&t=" + Date.now());
     const data = await res.json();
@@ -467,7 +467,10 @@ async function loadGhosts(){
       });
       renderGrid();
     }
-  }catch(e){}
+  }catch(e){
+    // ถ้าต่อ backend ไม่ได้ ให้แสดงผีเริ่มต้นในโค้ดไว้ก่อน (ไม่ปล่อยจอค้าง "กำลังโหลด…")
+    renderGrid();
+  }
 }
 
 function openLegend(id){
@@ -688,7 +691,10 @@ function toggleSound(){
     btn.textContent = "🔊 เพลง";
   }
 }
-renderGrid();
+// แสดง "กำลังโหลด…" ก่อน แล้วรอ backend ส่งข้อมูลจริงมาค่อย renderGrid()
+// (ไม่โชว์ผีเก่าที่ฝังในโค้ดก่อน เพื่อไม่ให้ค้างรูป/ชื่อเก่าตอนเปิด)
+document.getElementById("ghostGrid").innerHTML =
+  '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:40px 0; font-size:15px">กำลังโหลดผี…</div>';
 loadGhosts();
 loadStatus();
 setInterval(loadStatus, 10000);
