@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Charmonman:wght@700&family=Mitr:wght@300;400;500;600;700&family=Poppins:wght@200;300;400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --bg:#0a0808; --bg2:#120d0d; --panel:#181111; --border:#3a1f1f;
@@ -190,6 +191,7 @@ nav .wrap{display:flex; align-items:center; justify-content:space-between; heigh
 .btn{flex:1; padding:11px 0; border-radius:9px; font-family:'Mitr'; font-size:14px; cursor:pointer; border:1px solid var(--border)}
 .btn.primary{background:linear-gradient(180deg,var(--blood-bright),var(--blood)); color:#fff; border:none; font-weight:600}
 .btn.ghostbtn{background:transparent; color:var(--dim)}
+.btn:disabled{opacity:.6; cursor:wait}
 
 label{display:block; font-size:12.5px; color:var(--dim); margin:14px 0 6px}
 select,input{width:100%; background:#120d0d; border:1px solid var(--border); color:var(--fog);
@@ -217,7 +219,6 @@ footer .fname{font-family:'Charmonman',cursive; font-size:22px; color:var(--bloo
   display:flex; align-items:center; justify-content:center; transition:opacity 1s ease;}
 #introScreen.hide{opacity:0; pointer-events:none;}
 #introScreen .intro-video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;}
-/* overlay มืดคลุมวิดีโอ ให้ตัวอักษรเด่น */
 #introScreen .intro-dark{position:absolute; inset:0; pointer-events:none;
   background:linear-gradient(180deg, rgba(6,4,4,.55), rgba(6,4,4,.68));}
 #introScreen .intro-vignette{position:absolute; inset:0; pointer-events:none;
@@ -235,21 +236,57 @@ footer .fname{font-family:'Charmonman',cursive; font-size:22px; color:var(--bloo
 #introScreen .skipbtn::after{content:" ›"; font-size:18px;}
 body.intro-lock{overflow:hidden;}
 
-/* ===== การ์ดกิจกรรมหลังโหวต ===== */
-.votecard{position:relative; width:100%; aspect-ratio:4/5; border-radius:14px; overflow:hidden;
-  border:1px solid var(--border); background:#0d0909 center/cover no-repeat; box-shadow:0 12px 40px rgba(0,0,0,.6)}
-.votecard .vc-img{position:absolute; inset:0; background-size:cover; background-position:center}
+/* ===== การ์ดกิจกรรมหลังโหวต (พรีเมียม) =====
+   ขนาดตัวอักษรทั้งหมดใช้หน่วย em ผูกกับความกว้างการ์ด (JS ตั้ง font-size = กว้าง/30)
+   ทำให้การ์ดหน้าจอกับรูปที่ดาวน์โหลด (1080x1350) หน้าตาเหมือนกันทุกพิกเซล */
+.votecard{position:relative; width:100%; aspect-ratio:4/5; border-radius:.6em; overflow:hidden;
+  background:#0a0606; font-size:12px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.votecard .vc-img{position:absolute; inset:0; background-size:cover; background-position:center top; background-repeat:no-repeat}
 .votecard .vc-overlay{position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(5,3,3,.35) 0%, rgba(5,3,3,.55) 45%, rgba(5,3,3,.92) 100%)}
-.votecard .vc-content{position:absolute; inset:0; z-index:2; display:flex; flex-direction:column;
-  align-items:center; justify-content:flex-end; text-align:center; padding:22px 18px}
-.votecard .vc-head{font-family:'Poppins',sans-serif; font-weight:600; letter-spacing:.1em; font-size:13px;
-  color:#f6f2ec; text-shadow:0 0 10px rgba(194,42,42,.6); margin-bottom:auto; padding-top:6px}
-.votecard .vc-person{font-family:'Mitr',sans-serif; font-size:15px; color:#f2ece6; margin-bottom:6px}
-.votecard .vc-mid{font-family:'Mitr',sans-serif; font-size:12px; color:var(--dim); margin-bottom:2px}
-.votecard .vc-ghost{font-family:'Charmonman',cursive; font-size:34px; color:#fff; line-height:1.1;
-  text-shadow:0 0 16px rgba(194,42,42,.75), 0 0 32px rgba(125,20,20,.5)}
-.votecard .vc-tag{font-family:'Mitr',sans-serif; font-size:11.5px; color:var(--gold); margin-top:8px}
+  background:linear-gradient(180deg, rgba(5,3,3,.35) 0%, rgba(5,3,3,0) 16%, rgba(5,3,3,0) 66%, rgba(5,3,3,.7) 100%)}
+.votecard .vc-cloth{position:absolute; top:0; width:3.6em; height:11em; z-index:2; pointer-events:none}
+.votecard .vc-cloth.l{left:0; background:linear-gradient(100deg, rgba(125,12,12,.8), rgba(125,12,12,.4) 45%, transparent 85%)}
+.votecard .vc-cloth.r{right:0; background:linear-gradient(260deg, rgba(125,12,12,.8), rgba(125,12,12,.4) 45%, transparent 85%)}
+.votecard .vc-frame{position:absolute; inset:.5em; border:.09em solid #b99b6b; border-radius:.4em; z-index:3; pointer-events:none;
+  box-shadow:inset 0 0 .9em rgba(0,0,0,.55)}
+.votecard .vc-frame2{position:absolute; inset:.95em; border:.045em solid rgba(185,155,107,.55); border-radius:.3em; z-index:3; pointer-events:none}
+.votecard .vc-corner{position:absolute; width:2em; height:2em; z-index:4; pointer-events:none}
+.votecard .vc-corner svg{width:100%; height:100%; display:block}
+.votecard .vc-corner.tl{top:.3em; left:.3em}
+.votecard .vc-corner.tr{top:.3em; right:.3em; transform:scaleX(-1)}
+.votecard .vc-corner.bl{bottom:.3em; left:.3em; transform:scaleY(-1)}
+.votecard .vc-corner.br{bottom:.3em; right:.3em; transform:scale(-1,-1)}
+
+.votecard .vc-headplate{position:absolute; top:1.5em; left:50%; transform:translateX(-50%); width:50%; z-index:5;
+  text-align:center; padding:.3em 0 .4em; border:.07em solid #b99b6b; border-radius:.7em;
+  background:linear-gradient(180deg, rgba(22,12,12,.88), rgba(8,5,5,.88));
+  box-shadow:0 .3em .9em rgba(0,0,0,.6)}
+.votecard .vc-skull{position:absolute; top:-1em; left:50%; transform:translateX(-50%); font-size:1.25em; line-height:1}
+.votecard .vc-head{font-family:'Charmonman',cursive; font-weight:700; font-size:1.3em; line-height:1.15; color:#ecd6a6;
+  letter-spacing:.03em; text-shadow:0 .08em .25em rgba(0,0,0,.9)}
+
+.votecard .vc-plate{position:absolute; left:50%; bottom:1.7em; transform:translateX(-50%); width:62%; z-index:5;
+  text-align:center; padding:.6em .8em .55em; border:.07em solid #b99b6b; border-radius:.9em;
+  background:linear-gradient(180deg, rgba(20,11,11,.86), rgba(6,4,4,.9));
+  box-shadow:0 .4em 1.2em rgba(0,0,0,.65), inset 0 0 .8em rgba(125,20,20,.4)}
+.votecard .vc-person{font-family:'Mitr',sans-serif; font-weight:400; font-size:.95em; color:#ecd6a6; line-height:1.4;
+  text-shadow:0 .06em .2em rgba(0,0,0,.8)}
+.votecard .vc-orn{display:flex; align-items:center; justify-content:center; gap:.4em; margin:.15em 0 .1em; color:#b99b6b; font-size:.7em; line-height:1.2}
+.votecard .vc-orn i{flex:1; height:.07em; background:linear-gradient(90deg, transparent, #b99b6b, transparent)}
+.votecard .vc-mid{font-family:'Mitr',sans-serif; font-size:.95em; color:#f2ece6; line-height:1.2}
+.votecard .vc-ghost{font-family:'Charmonman',cursive; font-weight:700; font-size:2.5em; line-height:1.15; color:#fbf4ec; margin:0 0 .05em;
+  text-shadow:0 0 .1em #c22a2a, 0 0 .26em rgba(194,42,42,.95), 0 .08em .4em rgba(125,12,12,.9), .03em .05em 0 rgba(120,10,10,.9)}
+.votecard .vc-tag{font-family:'Mitr',sans-serif; font-size:.85em; color:#ecd6a6; line-height:1.3}
+
+.votecard .vc-qr{position:absolute; right:.4em; z-index:6; text-align:center; width:4.4em; bottom:calc(100% + .6em)}
+.votecard .vc-qrbox{background:#fff; padding:.25em; border-radius:.35em; border:.09em solid #b99b6b; box-shadow:0 .25em .7em rgba(0,0,0,.65)}
+.votecard .vc-qrbox img,.votecard .vc-qrbox canvas{width:100%!important; height:auto!important; display:block}
+.votecard .vc-qrbox canvas{display:none!important}
+.votecard .vc-qrcap{font-family:'Mitr',sans-serif; font-size:.65em; color:#ecd6a6; margin-top:.3em; line-height:1.2;
+  text-shadow:0 .06em .2em rgba(0,0,0,.9)}
+.cardbtns{display:flex; gap:10px; margin-top:16px}
+.cardhint{font-size:11.5px; color:var(--dim); text-align:center; margin-top:10px}
 </style>
 </head>
 <body class="intro-lock">
@@ -372,22 +409,43 @@ body.intro-lock{overflow:hidden;}
 
 <!-- การ์ดกิจกรรมหลังโหวต -->
 <div class="overlay" id="cardOverlay">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:440px">
     <button class="close" onclick="closeModal('cardOverlay')">✕</button>
     <h3 style="font-size:24px; color:#f6f1ea; text-shadow:0 0 10px rgba(255,255,255,.4)">การ์ดร่วมกิจกรรม 🎃</h3>
-    <div class="sub" style="margin-bottom:10px">บันทึกรูปไปแชร์ได้เลย</div>
+    <div class="sub" style="margin-bottom:10px">ดาวน์โหลดหรือแชร์การ์ดของคุณได้เลย</div>
+
     <div id="voteCard" class="votecard">
       <div class="vc-img" id="vcImg"></div>
       <div class="vc-overlay"></div>
-      <div class="vc-content">
+      <div class="vc-cloth l"></div><div class="vc-cloth r"></div>
+      <div class="vc-frame"></div><div class="vc-frame2"></div>
+      <div class="vc-corner tl"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
+      <div class="vc-corner tr"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
+      <div class="vc-corner bl"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
+      <div class="vc-corner br"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
+
+      <div class="vc-headplate">
         <div class="vc-head">COM7 Halloween 2026</div>
+      </div>
+
+      <div class="vc-plate">
+        <div class="vc-qr">
+          <div class="vc-qrbox"><div id="vcQr"></div></div>
+          <div class="vc-qrcap">สแกนเข้าร่วมโหวต</div>
+        </div>
         <div class="vc-person"><span id="vcId"></span> <span id="vcName"></span></div>
+        <div class="vc-orn"><i></i>❖<i></i></div>
         <div class="vc-mid">โหวตให้</div>
         <div class="vc-ghost" id="vcGhost"></div>
         <div class="vc-tag">คือผีที่หลอนที่สุด</div>
       </div>
     </div>
-    <button class="btn primary" style="margin-top:16px; width:100%" id="dlCardBtn" onclick="downloadCard()">⬇ ดาวน์โหลดการ์ด</button>
+
+    <div class="cardbtns">
+      <button class="btn ghostbtn" style="border-color:var(--gold); color:var(--gold)" id="dlCardBtn" onclick="downloadCard()">⬇ ดาวน์โหลด</button>
+      <button class="btn primary" id="shareCardBtn" onclick="shareCard()">📤 แชร์การ์ด</button>
+    </div>
+    <div class="cardhint">ได้รูปความละเอียดสูง 1080 × 1350 px</div>
   </div>
 </div>
 
@@ -396,6 +454,10 @@ body.intro-lock{overflow:hidden;}
 <script>
 /* ====== ตั้งค่า endpoint ของ Google Apps Script Web App ที่นี่ ====== */
 const API_URL = "https://script.google.com/macros/s/AKfycbxCx5c1rEwKOnBfc0xbkqcz4yYeOfjmO_vOjyM5b7oyfkBSCulBlTFFLItnyPB-w9v7/exec";
+
+/* ====== ลิงก์ที่ QR Code บนการ์ดจะพาไป ======
+   ค่าเริ่มต้น = ลิงก์หน้าเว็บนี้ ถ้าเว็บจริงใช้ลิงก์อื่น ให้ใส่ตรงนี้ เช่น "https://example.com/vote/" */
+const SITE_URL = "https://aumpaapavee-alt.github.io/COM7-halloween-2569/";
 
 // ===== ตัวช่วยเรียก backend แบบมี timeout กันหน้าค้าง =====
 async function apiFetch(url, options){
@@ -589,24 +651,36 @@ async function submitVote(){
   btn.disabled = false; btn.textContent = "ยืนยันโหวต";
 }
 
+/* ================== การ์ดกิจกรรมหลังโหวต ================== */
 let lastVote = null;
+let cardBlob = null;          // รูปการ์ดที่สร้างรอไว้ (ให้กดแชร์/ดาวน์โหลดได้ทันที)
+let cardBlobKey = "";         // กันใช้รูปเก่าเมื่อข้อมูลเปลี่ยน
+const CARD_W = 1080, CARD_H = 1350;   // ขนาดรูปที่ดาวน์โหลด (4:5)
+
 function cardImgSrc(gh){
   // ใช้รูป local (same-origin) ก่อนเสมอ -> html2canvas จับได้ชัวร์
-  // ถ้า imageUrl เป็น assets/ ใช้เลย; ถ้าเป็น Drive ลอง local ตาม id ก่อน
   if(gh.imageUrl && gh.imageUrl.indexOf("assets/")===0) return gh.imageUrl;
-  // mapping id -> local asset (รูป default มีครบทุกตัว)
   return "assets/" + gh.id + ".jpg";
 }
+function fitCard(){
+  const c = document.getElementById("voteCard");
+  if(c && c.offsetWidth) c.style.fontSize = (c.offsetWidth/30) + "px";
+}
+function buildQr(){
+  const box = document.getElementById("vcQr");
+  if(!box || box.dataset.done || typeof QRCode === "undefined") return;
+  new QRCode(box, {text:SITE_URL, width:400, height:400, colorDark:"#120808", colorLight:"#ffffff", correctLevel:QRCode.CorrectLevel.M});
+  box.dataset.done = "1";
+}
 function showVoteCard(info){
-  lastVote = info;
+  lastVote = info; cardBlob = null; cardBlobKey = "";
   const gh = GHOSTS.find(g=>g.id===info.ghostId) || {};
   const localSrc = cardImgSrc(gh);
   const vcImg = document.getElementById("vcImg");
-  // preload เพื่อให้แน่ใจว่ารูปพร้อมก่อนแปลงเป็น PNG
   const pre = new Image();
   pre.onload = ()=>{ vcImg.style.backgroundImage = "url('"+localSrc+"')"; };
   pre.onerror = ()=>{
-    // ถ้า local ไม่มี (เผื่อผีที่แอดมินเพิ่มใหม่ยังไม่มีรูป local) ค่อย fallback Drive
+    // ถ้า local ไม่มี (ผีที่แอดมินเพิ่มใหม่ยังไม่มีรูป local) ค่อย fallback Drive
     const d = gh.imageUrl ? driveImg(gh.imageUrl) : "";
     vcImg.style.backgroundImage = d ? "url('"+d+"')" : "none";
   };
@@ -616,38 +690,110 @@ function showVoteCard(info){
   document.getElementById("vcName").textContent = "คุณ " + info.empName;
   document.getElementById("vcGhost").textContent = info.ghostName;
   showModal("cardOverlay");
+  buildQr();
+  fitCard();
+  // สร้างรูปรอไว้ล่วงหน้า เพื่อให้กดแชร์ได้ทันที (มือถือบางรุ่นไม่ยอมให้แชร์ถ้ารอนาน)
+  setTimeout(prepareCard, 800);
 }
+window.addEventListener("resize", fitCard);
+
 function waitCardImg(){
-  // รอให้รูปพื้นหลังการ์ดโหลดเสร็จก่อน แปลงเป็น PNG
   return new Promise((resolve)=>{
     const el = document.getElementById("vcImg");
     const bg = el.style.backgroundImage || "";
     const m = bg.match(/url\(['"]?([^'"\)]+)['"]?\)/);
     if(!m){ resolve(); return; }
     const im = new Image();
-    im.crossOrigin = "anonymous";
     im.onload = ()=>resolve();
     im.onerror = ()=>resolve();
     im.src = m[1];
     if(im.complete) resolve();
   });
 }
+
+/* สร้างรูปการ์ดแบบ 1080x1350 จริง: คัดลอกการ์ดไปวางนอกจอที่ขนาดเต็ม แล้วถ่ายที่ scale 1
+   -> ตัวอักษร/กรอบ/QR คมชัดเท่ากันทุกเครื่อง ไม่ขึ้นกับขนาดหน้าจอ */
+async function makeCardBlob(){
+  if(typeof html2canvas === "undefined") throw new Error("no html2canvas");
+  await waitCardImg();
+  if(document.fonts){
+    try{
+      await Promise.all([
+        document.fonts.load("700 40px Charmonman","โหวตผีไทย"),
+        document.fonts.load("400 24px Mitr","โหวตให้ ID คุณ"),
+        document.fonts.ready
+      ]);
+    }catch(e){}
+  }
+  const src = document.getElementById("voteCard");
+  const clone = src.cloneNode(true);
+  clone.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+  clone.removeAttribute("id");
+  clone.style.cssText += ";position:fixed;left:-10000px;top:0;width:"+CARD_W+"px;height:"+CARD_H+"px;aspect-ratio:auto;border-radius:0;box-shadow:none;font-size:"+(CARD_W/30)+"px;";
+  document.body.appendChild(clone);
+  try{
+    await new Promise(r=>setTimeout(r,250));
+    const canvas = await html2canvas(clone, {
+      useCORS:true, allowTaint:false, backgroundColor:"#0a0606", logging:false,
+      scale:1, width:CARD_W, height:CARD_H, windowWidth:CARD_W+200
+    });
+    return await new Promise(res=>canvas.toBlob(res, "image/png"));
+  } finally {
+    clone.remove();
+  }
+}
+function currentKey(){
+  return lastVote ? [lastVote.empId, lastVote.empName, lastVote.ghostId].join("|") : "";
+}
+async function getCardBlob(){
+  const key = currentKey();
+  if(cardBlob && cardBlobKey === key) return cardBlob;
+  cardBlob = await makeCardBlob();
+  cardBlobKey = key;
+  return cardBlob;
+}
+async function prepareCard(){
+  try{ await getCardBlob(); }catch(e){ cardBlob = null; }
+}
+function cardFileName(){
+  return "COM7Halloween2026_" + ((lastVote && lastVote.empId) ? lastVote.empId : "card") + ".png";
+}
 async function downloadCard(){
   const btn = document.getElementById("dlCardBtn");
-  const card = document.getElementById("voteCard");
-  if(typeof html2canvas === "undefined"){ toast("ยังโหลดเครื่องมือไม่เสร็จ ลองใหม่อีกครั้ง"); return; }
+  const old = btn.textContent;
   btn.disabled = true; btn.textContent = "กำลังสร้างรูป…";
   try{
-    await waitCardImg();
-    await new Promise(r=>setTimeout(r,150));
-    const canvas = await html2canvas(card, {useCORS:true, allowTaint:false, backgroundColor:"#0d0909", scale:2, logging:false});
-    const link = document.createElement("a");
-    const safe = (lastVote && lastVote.empId ? lastVote.empId : "card");
-    link.download = "COM7Halloween2026_" + safe + ".png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const blob = await getCardBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = cardFileName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
   }catch(e){ toast("บันทึกรูปไม่สำเร็จ ลองใหม่อีกครั้ง"); }
-  btn.disabled = false; btn.textContent = "⬇ ดาวน์โหลดการ์ด";
+  btn.disabled = false; btn.textContent = old;
+}
+async function shareCard(){
+  const btn = document.getElementById("shareCardBtn");
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = "กำลังเตรียมรูป…";
+  try{
+    const blob = await getCardBlob();
+    const file = new File([blob], cardFileName(), {type:"image/png"});
+    const data = {
+      files:[file],
+      title:"COM7 Halloween 2026",
+      text:"ฉันโหวตให้ " + (lastVote ? lastVote.ghostName : "") + " คือผีที่หลอนที่สุด! มาร่วมโหวตกัน 👻 " + SITE_URL
+    };
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share(data);
+    } else {
+      await downloadCard();
+      toast("อุปกรณ์นี้แชร์ตรงไม่ได้ บันทึกรูปให้แล้ว นำไปแชร์ต่อได้เลย");
+    }
+  }catch(e){
+    if(!e || e.name !== "AbortError") toast("แชร์ไม่สำเร็จ ลองกดดาวน์โหลดแทนนะคะ");
+  }
+  btn.disabled = false; btn.textContent = old;
 }
 function markPicked(id){
   document.querySelectorAll(".card").forEach(c=>c.classList.remove("picked"));
@@ -713,8 +859,8 @@ function spawnSmoke(){
     s.style.left = (6 + Math.random()*88) + "%";
     const dur = 8 + Math.random()*7;          // 8-15s ต่อรอบ
     s.style.setProperty("--dur", dur + "s");
-    s.style.setProperty("--delay", (-Math.random()*dur) + "s"); // เริ่มไม่พร้อมกัน = ลอยเป็นช่วงๆ
-    const size = 16 + Math.random()*20;   // เล็กๆ เหมือนควันธูป
+    s.style.setProperty("--delay", (-Math.random()*dur) + "s");
+    const size = 16 + Math.random()*20;
     s.style.width = s.style.height = size + "px";
     box.appendChild(s);
   }
@@ -741,20 +887,16 @@ function endIntro(){
   function startPlayback(){
     if(started) return; started = true;
     if(loadTimer) clearTimeout(loadTimer);
-    // นับเวลา 6.5 วิ จากตอนเริ่มเล่นจริง (กันค้าง/นับก่อนวิดีโอเล่น)
     endTimer = setTimeout(endIntro, PLAY_MS);
   }
 
-  // เริ่มนับเมื่อวิดีโอ "เล่นจริง" (มีเฟรมขยับแล้ว) — กันจอค้าง
   v.addEventListener("playing", startPlayback, {once:true});
   v.addEventListener("timeupdate", ()=>{ if(v.currentTime > 0.05) startPlayback(); }, {once:true});
   v.addEventListener("ended", endIntro);
   v.addEventListener("error", endIntro);
 
-  // กันเหนียว: โหลดนานเกินไป ยังไม่เริ่มเล่น -> ข้ามเข้าเว็บ
   loadTimer = setTimeout(()=>{ if(!started) endIntro(); }, LOAD_TIMEOUT);
 
-  // พยายามเล่นเมื่อ buffer พอ (ลื่นกว่าเล่นทันทีที่ยังโหลดไม่พอ)
   function tryPlay(){ const p = v.play && v.play(); if(p && p.catch) p.catch(()=>{}); }
   if(v.readyState >= 3){ tryPlay(); }
   else { v.addEventListener("canplay", tryPlay, {once:true}); tryPlay(); }
@@ -800,13 +942,11 @@ function toggleSound(){
   }
 }
 // แสดงผีทันที (ไม่ต้องรอ backend = เว็บขึ้นเร็ว ไม่ค้าง "กำลังโหลด")
-// แล้ว loadGhosts() จะดึงข้อมูลล่าสุดมาทับเงียบๆ ภายหลัง (+ cache-buster กันของเก่า + รีเฟรชทุก 10 วิ)
 renderGrid();
 loadGhosts();
 loadStatus();
 setInterval(loadStatus, 10000);
 setInterval(loadGhosts, 10000);
-// อัปเดตข้อมูลเมื่อผู้ใช้กลับมาที่แท็บ (เห็นของใหม่ทันทีโดยไม่ต้องรีเฟรช)
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ loadGhosts(); loadStatus(); } });
 </script>
 </body>
