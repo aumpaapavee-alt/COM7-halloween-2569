@@ -268,7 +268,7 @@ body.intro-lock{overflow:hidden;}
 
 .votecard .vc-plate{position:absolute; left:50%; bottom:1.7em; transform:translateX(-50%); width:62%; z-index:5;
   text-align:center; padding:.6em .8em .55em; border:.07em solid #b99b6b; border-radius:.9em;
-  background:radial-gradient(ellipse at 50% 50%, rgba(10,6,6,.38) 55%, rgba(60,14,14,.5) 100%);}
+  background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,.38) 55%, rgba(0,0,0,.55) 100%);}
 .votecard .vc-person{font-family:'Mitr',sans-serif; font-weight:400; font-size:.95em; color:#ecd6a6; line-height:1.4;
   text-shadow:0 .06em .2em rgba(0,0,0,.8)}
 .votecard .vc-orn{display:flex; align-items:center; justify-content:center; gap:.4em; margin:.15em 0 .1em; color:#b99b6b; font-size:.7em; line-height:1.2}
@@ -470,11 +470,23 @@ body.intro-lock{overflow:hidden;}
   </div>
 </div>
 
+<!-- ยืนยันเปลี่ยนผลโหวต -->
+<div class="overlay" id="changeOverlay">
+  <div class="modal" style="max-width:400px; text-align:center">
+    <h3 style="font-size:24px">เปลี่ยนผลโหวต?</h3>
+    <div class="legend" id="changeMsg" style="margin:10px 0 20px"></div>
+    <div class="btnrow">
+      <button class="btn ghostbtn" onclick="closeModal('changeOverlay')">ไม่เปลี่ยน</button>
+      <button class="btn primary" id="confirmChangeBtn" onclick="confirmChangeVote()">ยืนยันเปลี่ยน</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ====== ตั้งค่า endpoint ของ Google Apps Script Web App ที่นี่ ====== */
-const API_URL = "https://script.google.com/macros/s/AKfycbxCx5c1rEwKOnBfc0xbkqcz4yYeOfjmO_vOjyM5b7oyfkBSCulBlTFFLItnyPB-w9v7/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxx1ls-K26TDs6-Jk3isWIuz2euBsbampQxMheb_8vwB0HGYh3VN5vQgX8YkrHvIPj-/exec";
 
 /* ====== ลิงก์ที่ QR Code บนการ์ดจะพาไป ======
    ค่าเริ่มต้น = ลิงก์หน้าเว็บนี้ ถ้าเว็บจริงใช้ลิงก์อื่น ให้ใส่ตรงนี้ เช่น "https://example.com/vote/" */
@@ -658,7 +670,15 @@ async function submitVote(){
       body: JSON.stringify({action:"vote", company, empId, empName, ghostId:selectedGhost.id, ghostName:selectedGhost.name})
     });
     const data = await res.json();
-    if(data.ok){
+    if(!data.ok && data.needConfirm){
+      // เคยโหวตตัวอื่นแล้ว -> ถามยืนยันก่อนเปลี่ยน
+      pendingVote = {company, empId, empName, ghostId:selectedGhost.id, ghostName:selectedGhost.name};
+      const prev = data.prevGhostName ? ("“"+data.prevGhostName+"”") : "ผีตัวอื่น";
+      document.getElementById("changeMsg").innerHTML =
+        "รหัสพนักงานนี้โหวตให้ <b>"+escapeHtml(prev)+"</b> ไปแล้ว<br>ต้องการเปลี่ยนเป็น <b>“"+escapeHtml(selectedGhost.name)+"”</b> ใช่ไหม?";
+      closeModal("voteOverlay");
+      showModal("changeOverlay");
+    } else if(data.ok){
       toast("บันทึกการโหวตแล้ว ✓ ขอบคุณค่ะ");
       markPicked(selectedGhost.id);
       closeModal("voteOverlay");
@@ -672,6 +692,28 @@ async function submitVote(){
   btn.disabled = false; btn.textContent = "ยืนยันโหวต";
 }
 
+
+/* ===== ยืนยันเปลี่ยนผลโหวต ===== */
+let pendingVote = null;
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
+async function confirmChangeVote(){
+  if(!pendingVote) return;
+  const btn = document.getElementById("confirmChangeBtn");
+  btn.disabled = true; btn.textContent = "กำลังบันทึก…";
+  try{
+    const res = await apiFetch(API_URL, {method:"POST",
+      body: JSON.stringify(Object.assign({action:"vote", confirmChange:true}, pendingVote))});
+    const data = await res.json();
+    if(data.ok){
+      toast("เปลี่ยนผลโหวตแล้ว ✓");
+      markPicked(pendingVote.ghostId);
+      closeModal("changeOverlay");
+      showVoteCard({empId:pendingVote.empId, empName:pendingVote.empName, ghostId:pendingVote.ghostId, ghostName:pendingVote.ghostName});
+      pendingVote = null;
+    } else { toast(data.message || "เกิดข้อผิดพลาด กรุณาลองใหม่"); }
+  }catch(e){ toast("เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"); }
+  btn.disabled = false; btn.textContent = "ยืนยันเปลี่ยน";
+}
 /* ================== การ์ดกิจกรรมหลังโหวต ================== */
 let lastVote = null;
 let cardBlob = null;          // รูปการ์ดที่สร้างรอไว้ (ให้กดแชร์/ดาวน์โหลดได้ทันที)
