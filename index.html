@@ -9,7 +9,7 @@
 <title>โหวตผีไทย ที่คุณหลอนมากที่สุด</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👻</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Charmonman:wght@700&family=Mitr:wght@300;400;500;600;700&family=Poppins:wght@200;300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Charmonman:wght@700&family=Charm:wght@700&family=Mitr:wght@300;400;500;600;700&family=Poppins:wght@200;300;400;600;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -242,36 +242,35 @@ body.intro-lock{overflow:hidden;}
 .votecard{position:relative; width:100%; aspect-ratio:4/5; border-radius:.6em; overflow:hidden;
   background:#0a0606; font-size:12px;
   box-shadow:0 12px 40px rgba(0,0,0,.6)}
-.votecard .vc-img{position:absolute; left:0; right:0; top:0; height:74%;
-  background-size:cover; background-position:center 15%; background-repeat:no-repeat;
-  filter:brightness(1.32) contrast(1.06) saturate(1.08)}
+.votecard .vc-img{position:absolute; inset:0;
+  background-size:cover; background-position:center 15%; background-repeat:no-repeat}
 .votecard .vc-overlay{position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(5,3,3,.12) 0%, rgba(5,3,3,0) 15%, rgba(5,3,3,0) 62%, #0a0606 74%, #0a0606 100%)}
-.votecard .vc-cloth{position:absolute; top:0; width:3.6em; height:11em; z-index:2; pointer-events:none}
-.votecard .vc-cloth.l{left:0; background:linear-gradient(100deg, rgba(125,12,12,.8), rgba(125,12,12,.4) 45%, transparent 85%)}
-.votecard .vc-cloth.r{right:0; background:linear-gradient(260deg, rgba(125,12,12,.8), rgba(125,12,12,.4) 45%, transparent 85%)}
+  background:linear-gradient(180deg, rgba(5,3,3,.25) 0%, rgba(5,3,3,0) 16%, rgba(5,3,3,0) 58%, rgba(5,3,3,.45) 80%, rgba(5,3,3,.7) 100%)}
+.votecard .vc-cloth{position:absolute; top:0; width:2.6em; height:8em; z-index:2; pointer-events:none}
+.votecard .vc-cloth.l{left:0; background:linear-gradient(100deg, rgba(125,12,12,.5), rgba(125,12,12,.22) 40%, transparent 72%)}
+.votecard .vc-cloth.r{right:0; background:linear-gradient(260deg, rgba(125,12,12,.5), rgba(125,12,12,.22) 40%, transparent 72%)}
 .votecard .vc-frame{position:absolute; inset:.5em; border:.09em solid #b99b6b; border-radius:.4em; z-index:3; pointer-events:none;
   box-shadow:inset 0 0 .9em rgba(0,0,0,.55)}
 .votecard .vc-frame2{position:absolute; inset:.95em; border:.045em solid rgba(185,155,107,.55); border-radius:.3em; z-index:3; pointer-events:none}
-.votecard .vc-corner{position:absolute; width:2em; height:2em; z-index:4; pointer-events:none}
+.votecard .vc-corner{position:absolute; width:2.7em; height:2.7em; z-index:4; pointer-events:none}
 .votecard .vc-corner svg{width:100%; height:100%; display:block}
 .votecard .vc-corner.tl{top:.3em; left:.3em}
 .votecard .vc-corner.tr{top:.3em; right:.3em; transform:scaleX(-1)}
 .votecard .vc-corner.bl{bottom:.3em; left:.3em; transform:scaleY(-1)}
 .votecard .vc-corner.br{bottom:.3em; right:.3em; transform:scale(-1,-1)}
 
-.votecard .vc-headplate{position:absolute; top:1.5em; left:50%; transform:translateX(-50%); width:50%; z-index:5;
-  text-align:center; padding:.3em 0 .4em; border:.07em solid #b99b6b; border-radius:.7em;
-  background:linear-gradient(180deg, rgba(22,12,12,.88), rgba(8,5,5,.88));
-  box-shadow:0 .3em .9em rgba(0,0,0,.6)}
+.votecard .vc-headplate{position:absolute; top:1.6em; left:50%; transform:translateX(-50%); width:auto; max-width:80%; z-index:5;
+  white-space:nowrap; text-align:center; padding:.12em 1.1em .22em; border:.06em solid #b99b6b; border-radius:2em;
+  background:linear-gradient(180deg, rgba(22,12,12,.45), rgba(8,5,5,.55));
+  box-shadow:0 .25em .8em rgba(0,0,0,.55), inset 0 0 .6em rgba(125,20,20,.3)}
 .votecard .vc-skull{position:absolute; top:-1em; left:50%; transform:translateX(-50%); font-size:1.25em; line-height:1}
-.votecard .vc-head{font-family:'Charmonman',cursive; font-weight:700; font-size:1.3em; line-height:1.15; color:#ecd6a6;
-  letter-spacing:.03em; text-shadow:0 .08em .25em rgba(0,0,0,.9)}
+.votecard .vc-head{font-family:'Charm',cursive; font-weight:700; font-size:1.35em; line-height:1.25; color:#ecd09a;
+  letter-spacing:.02em; text-shadow:0 .05em .12em rgba(0,0,0,.95), 0 0 .35em rgba(194,42,42,.55)}
 
 .votecard .vc-plate{position:absolute; left:50%; bottom:1.7em; transform:translateX(-50%); width:62%; z-index:5;
   text-align:center; padding:.6em .8em .55em; border:.07em solid #b99b6b; border-radius:.9em;
-  background:linear-gradient(180deg, rgba(20,11,11,.86), rgba(6,4,4,.9));
-  box-shadow:0 .4em 1.2em rgba(0,0,0,.65), inset 0 0 .8em rgba(125,20,20,.4)}
+  background:linear-gradient(180deg, rgba(20,11,11,.42), rgba(6,4,4,.58));
+  box-shadow:0 .4em 1.2em rgba(0,0,0,.5), inset 0 0 .8em rgba(125,20,20,.35), inset 0 .05em 0 rgba(255,235,200,.12)}
 .votecard .vc-person{font-family:'Mitr',sans-serif; font-weight:400; font-size:.95em; color:#ecd6a6; line-height:1.4;
   text-shadow:0 .06em .2em rgba(0,0,0,.8)}
 .votecard .vc-orn{display:flex; align-items:center; justify-content:center; gap:.4em; margin:.15em 0 .1em; color:#b99b6b; font-size:.7em; line-height:1.2}
@@ -289,6 +288,16 @@ body.intro-lock{overflow:hidden;}
   text-shadow:0 .06em .2em rgba(0,0,0,.9)}
 .cardbtns{display:flex; gap:10px; margin-top:16px}
 .cardhint{font-size:11.5px; color:var(--dim); text-align:center; margin-top:10px}
+
+/* ===== กรอบทองเงาวาว ===== */
+.votecard .vc-frame,.votecard .vc-frame2{display:none}
+.votecard .vc-goldframe{position:absolute; inset:0; width:100%; height:100%; z-index:3; pointer-events:none;
+  filter:drop-shadow(0 0 .25em rgba(246,220,149,.35))}
+.votecard .vc-shine{position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden; border-radius:inherit}
+.votecard .vc-shine::before{content:""; position:absolute; top:-20%; left:-60%; width:35%; height:140%;
+  background:linear-gradient(100deg, transparent, rgba(255,240,200,.18) 45%, rgba(255,250,230,.32) 50%, rgba(255,240,200,.18) 55%, transparent);
+  transform:rotate(12deg); animation:vcShine 4.5s ease-in-out infinite}
+@keyframes vcShine{0%,55%{left:-60%}100%{left:130%}}
 </style>
 </head>
 <body class="intro-lock">
@@ -421,10 +430,19 @@ body.intro-lock{overflow:hidden;}
       <div class="vc-overlay"></div>
       <div class="vc-cloth l"></div><div class="vc-cloth r"></div>
       <div class="vc-frame"></div><div class="vc-frame2"></div>
-      <div class="vc-corner tl"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
-      <div class="vc-corner tr"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
-      <div class="vc-corner bl"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
-      <div class="vc-corner br"><svg viewBox="0 0 40 40" fill="none" stroke="#d8bd8a" stroke-width="1.6"><path d="M3 37V12C3 7 7 3 12 3h25"/><path d="M9 37V16c0-4 3-7 7-7h21" stroke-width="0.9"/><circle cx="12" cy="12" r="2.2" fill="#d8bd8a"/><path d="M20 3c0 5-4 7-8 7" stroke-width="1"/></svg></div>
+      <svg class="vc-goldframe" viewBox="0 0 400 500" preserveAspectRatio="none">
+        <defs><linearGradient id="vcGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#7a5622"/><stop offset=".18" stop-color="#f6dc95"/><stop offset=".32" stop-color="#b8862e"/>
+          <stop offset=".5" stop-color="#fff4c8"/><stop offset=".68" stop-color="#a77a2a"/><stop offset=".84" stop-color="#f0d184"/><stop offset="1" stop-color="#6e4c1c"/>
+        </linearGradient></defs>
+        <rect x="5" y="5" width="390" height="490" rx="6" fill="none" stroke="url(#vcGold)" stroke-width="3.2"/>
+        <rect x="11" y="11" width="378" height="478" rx="4" fill="none" stroke="url(#vcGold)" stroke-width="1" opacity=".75"/>
+      </svg>
+      <div class="vc-shine"></div>
+      <div class="vc-corner tl"><svg viewBox="0 0 48 48" fill="none" stroke="#d8bd8a" stroke-linecap="round"><path d="M3 45V12C3 7 7 3 12 3h33" stroke-width="1.5"/><path d="M8 45V16c0-4.5 3.5-8 8-8h29" stroke-width=".8" opacity=".7"/><path d="M6 6c7-1 13 2 14 9-3-3-7-3-9-1 1-3 0-6-5-8z" fill="#d8bd8a" stroke="none"/><path d="M20 15c2-4 6-5 9-3-3 0-5 2-5 5" stroke-width="1.1"/><path d="M15 20c-4 2-5 6-3 9 0-3 2-5 5-5" stroke-width="1.1"/><path d="M27 3c0 3 2 5 5 5 M3 27c3 0 5 2 5 5" stroke-width="1"/><circle cx="35" cy="8" r="1.3" fill="#d8bd8a" stroke="none"/><circle cx="8" cy="35" r="1.3" fill="#d8bd8a" stroke="none"/></svg></div>
+      <div class="vc-corner tr"><svg viewBox="0 0 48 48" fill="none" stroke="#d8bd8a" stroke-linecap="round"><path d="M3 45V12C3 7 7 3 12 3h33" stroke-width="1.5"/><path d="M8 45V16c0-4.5 3.5-8 8-8h29" stroke-width=".8" opacity=".7"/><path d="M6 6c7-1 13 2 14 9-3-3-7-3-9-1 1-3 0-6-5-8z" fill="#d8bd8a" stroke="none"/><path d="M20 15c2-4 6-5 9-3-3 0-5 2-5 5" stroke-width="1.1"/><path d="M15 20c-4 2-5 6-3 9 0-3 2-5 5-5" stroke-width="1.1"/><path d="M27 3c0 3 2 5 5 5 M3 27c3 0 5 2 5 5" stroke-width="1"/><circle cx="35" cy="8" r="1.3" fill="#d8bd8a" stroke="none"/><circle cx="8" cy="35" r="1.3" fill="#d8bd8a" stroke="none"/></svg></div>
+      <div class="vc-corner bl"><svg viewBox="0 0 48 48" fill="none" stroke="#d8bd8a" stroke-linecap="round"><path d="M3 45V12C3 7 7 3 12 3h33" stroke-width="1.5"/><path d="M8 45V16c0-4.5 3.5-8 8-8h29" stroke-width=".8" opacity=".7"/><path d="M6 6c7-1 13 2 14 9-3-3-7-3-9-1 1-3 0-6-5-8z" fill="#d8bd8a" stroke="none"/><path d="M20 15c2-4 6-5 9-3-3 0-5 2-5 5" stroke-width="1.1"/><path d="M15 20c-4 2-5 6-3 9 0-3 2-5 5-5" stroke-width="1.1"/><path d="M27 3c0 3 2 5 5 5 M3 27c3 0 5 2 5 5" stroke-width="1"/><circle cx="35" cy="8" r="1.3" fill="#d8bd8a" stroke="none"/><circle cx="8" cy="35" r="1.3" fill="#d8bd8a" stroke="none"/></svg></div>
+      <div class="vc-corner br"><svg viewBox="0 0 48 48" fill="none" stroke="#d8bd8a" stroke-linecap="round"><path d="M3 45V12C3 7 7 3 12 3h33" stroke-width="1.5"/><path d="M8 45V16c0-4.5 3.5-8 8-8h29" stroke-width=".8" opacity=".7"/><path d="M6 6c7-1 13 2 14 9-3-3-7-3-9-1 1-3 0-6-5-8z" fill="#d8bd8a" stroke="none"/><path d="M20 15c2-4 6-5 9-3-3 0-5 2-5 5" stroke-width="1.1"/><path d="M15 20c-4 2-5 6-3 9 0-3 2-5 5-5" stroke-width="1.1"/><path d="M27 3c0 3 2 5 5 5 M3 27c3 0 5 2 5 5" stroke-width="1"/><circle cx="35" cy="8" r="1.3" fill="#d8bd8a" stroke="none"/><circle cx="8" cy="35" r="1.3" fill="#d8bd8a" stroke="none"/></svg></div>
 
       <div class="vc-headplate">
         <div class="vc-head">COM7 Halloween 2026</div>
@@ -688,6 +706,9 @@ function showVoteCard(info){
   };
   pre.src = localSrc;
   vcImg.style.backgroundImage = "url('"+localSrc+"')";
+  // ปรับตำแหน่งรูปเฉพาะบางตัวที่ตัวผีอยู่ต่ำ ไม่ให้โดนป้ายล่างบัง (ขยับรูปขึ้น)
+  var posMap = {ghost_1790571333054:"center 2%", ghost_1790584059193:"center 2%"};
+  vcImg.style.backgroundPosition = posMap[info.ghostId] || "center 15%";
   document.getElementById("vcId").textContent = "ID " + info.empId;
   document.getElementById("vcName").textContent = "คุณ " + info.empName;
   document.getElementById("vcGhost").textContent = info.ghostName;
@@ -776,6 +797,7 @@ async function makeCardBlob(){
     try{
       await Promise.all([
         document.fonts.load("700 40px Charmonman","โหวตผีไทย"),
+        document.fonts.load("700 40px Charm","COM7 Halloween 2026"),
         document.fonts.load("400 24px Mitr","โหวตให้ ID คุณ"),
         document.fonts.ready
       ]);
@@ -783,7 +805,8 @@ async function makeCardBlob(){
   }
   const src = document.getElementById("voteCard");
   const clone = src.cloneNode(true);
-  clone.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+  clone.querySelectorAll("[id]").forEach(e=>{ if(!e.closest("svg")) e.removeAttribute("id"); });
+  clone.querySelectorAll(".vc-shine").forEach(e=>e.remove());
   clone.removeAttribute("id");
   clone.style.cssText += ";position:fixed;left:-10000px;top:0;width:"+CARD_W+"px;min-width:0;height:"+CARD_H+"px;aspect-ratio:auto;border-radius:0;box-shadow:none;margin:0;font-size:"+(CARD_W/30)+"px;";
   try{
@@ -792,15 +815,7 @@ async function makeCardBlob(){
     const bg = (srcImgEl && srcImgEl.style.backgroundImage) || "";
     const mm = bg.match(/url\(['"]?([^'"\)]+)['"]?\)/);
     if(mm && cloneImgEl){
-      const brightened = await brightenImage(mm[1], 1.32, 1.06, 1.08);
-      cloneImgEl.style.filter = "none";
-      if(brightened){
-        cloneImgEl.style.backgroundImage = "url('"+brightened+"')";
-      } else {
-        const lift = document.createElement("div");
-        lift.style.cssText = "position:absolute;inset:0;background:rgba(255,255,255,.14)";
-        cloneImgEl.appendChild(lift);
-      }
+      cloneImgEl.style.filter = "none";   // ใช้สีที่อบไว้ในไฟล์ตรงๆ ไม่อบซ้ำ
     }
   }catch(e){}
   document.body.appendChild(clone);
