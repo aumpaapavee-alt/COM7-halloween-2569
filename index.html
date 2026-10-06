@@ -713,6 +713,28 @@ function waitCardImg(){
 
 /* สร้างรูปการ์ดแบบ 1080x1350 จริง: คัดลอกการ์ดไปวางนอกจอที่ขนาดเต็ม แล้วถ่ายที่ scale 1
    -> ตัวอักษร/กรอบ/QR คมชัดเท่ากันทุกเครื่อง ไม่ขึ้นกับขนาดหน้าจอ */
+// เพิ่มความสว่าง/คอนทราสต์/ความอิ่มสีให้รูป แล้วคืนเป็น dataURL (เลียนแบบ filter:brightness ที่ html2canvas ไม่รองรับ)
+function brightenImage(url, bright, contrast, sat){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = ()=>{
+      try{
+        const cv = document.createElement("canvas");
+        cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+        const ctx = cv.getContext("2d");
+        if(ctx.filter !== undefined){
+          ctx.filter = "brightness("+bright+") contrast("+contrast+") saturate("+sat+")";
+        }
+        ctx.drawImage(img, 0, 0);
+        resolve(cv.toDataURL("image/jpeg", 0.92));
+      }catch(e){ resolve(null); }   // ถ้า canvas ติด CORS (รูปจาก Drive) คืน null ใช้รูปเดิม
+    };
+    img.onerror = ()=>resolve(null);
+    img.src = url;
+    if(img.complete && img.naturalWidth) img.onload();
+  });
+}
 async function makeCardBlob(){
   if(typeof html2canvas === "undefined") throw new Error("no html2canvas");
   await waitCardImg();
@@ -730,6 +752,21 @@ async function makeCardBlob(){
   clone.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
   clone.removeAttribute("id");
   clone.style.cssText += ";position:fixed;left:-10000px;top:0;width:"+CARD_W+"px;height:"+CARD_H+"px;aspect-ratio:auto;border-radius:0;box-shadow:none;font-size:"+(CARD_W/30)+"px;";
+  // === ชดเชยความสว่าง: html2canvas ไม่รองรับ filter:brightness() ===
+  // วาดรูปพื้นหลังลง canvas พร้อมเพิ่มความสว่างเอง แล้วใช้เป็น background ของ clone
+  try{
+    const srcImgEl = src.querySelector(".vc-img");
+    const cloneImgEl = clone.querySelector(".vc-img");
+    const bg = (srcImgEl && srcImgEl.style.backgroundImage) || "";
+    const mm = bg.match(/url\(['"]?([^'"\)]+)['"]?\)/);
+    if(mm && cloneImgEl){
+      const brightened = await brightenImage(mm[1], 1.32, 1.06, 1.08);
+      if(brightened){
+        cloneImgEl.style.backgroundImage = "url('"+brightened+"')";
+        cloneImgEl.style.filter = "none";   // ปิด filter เดิมที่ html2canvas อ่านไม่ได้
+      }
+    }
+  }catch(e){}
   document.body.appendChild(clone);
   try{
     await new Promise(r=>setTimeout(r,250));
