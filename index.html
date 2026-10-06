@@ -242,9 +242,11 @@ body.intro-lock{overflow:hidden;}
 .votecard{position:relative; width:100%; aspect-ratio:4/5; border-radius:.6em; overflow:hidden;
   background:#0a0606; font-size:12px;
   box-shadow:0 12px 40px rgba(0,0,0,.6)}
-.votecard .vc-img{position:absolute; inset:0; background-size:cover; background-position:center top; background-repeat:no-repeat; filter:brightness(1.32) contrast(1.06) saturate(1.08)}
+.votecard .vc-img{position:absolute; left:0; right:0; top:0; height:74%;
+  background-size:cover; background-position:center 15%; background-repeat:no-repeat;
+  filter:brightness(1.32) contrast(1.06) saturate(1.08)}
 .votecard .vc-overlay{position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(5,3,3,.18) 0%, rgba(5,3,3,0) 20%, rgba(5,3,3,0) 72%, rgba(5,3,3,.55) 100%)}
+  background:linear-gradient(180deg, rgba(5,3,3,.12) 0%, rgba(5,3,3,0) 15%, rgba(5,3,3,0) 62%, #0a0606 74%, #0a0606 100%)}
 .votecard .vc-cloth{position:absolute; top:0; width:3.6em; height:11em; z-index:2; pointer-events:none}
 .votecard .vc-cloth.l{left:0; background:linear-gradient(100deg, rgba(125,12,12,.8), rgba(125,12,12,.4) 45%, transparent 85%)}
 .votecard .vc-cloth.r{right:0; background:linear-gradient(260deg, rgba(125,12,12,.8), rgba(125,12,12,.4) 45%, transparent 85%)}
@@ -735,6 +737,38 @@ function brightenImage(url, bright, contrast, sat){
     if(img.complete && img.naturalWidth) img.onload();
   });
 }
+function brightenImage(url, bright, contrast, sat){
+  return new Promise((resolve)=>{
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = ()=>{
+      try{
+        const MAX = 1600;
+        const k = Math.min(1, MAX/Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.round(img.naturalWidth*k), h = Math.round(img.naturalHeight*k);
+        const cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        const d = ctx.getImageData(0, 0, w, h);
+        const p = d.data;
+        const cl = v => v < 0 ? 0 : v > 1 ? 1 : v;
+        for(let i=0; i<p.length; i+=4){
+          let r = p[i]/255*bright, g = p[i+1]/255*bright, b = p[i+2]/255*bright;
+          r = cl((r-.5)*contrast+.5); g = cl((g-.5)*contrast+.5); b = cl((b-.5)*contrast+.5);
+          const l = .2126*r + .7152*g + .0722*b;
+          r = cl(l+(r-l)*sat); g = cl(l+(g-l)*sat); b = cl(l+(b-l)*sat);
+          p[i] = r*255; p[i+1] = g*255; p[i+2] = b*255;
+        }
+        ctx.putImageData(d, 0, 0);
+        resolve(cv.toDataURL("image/jpeg", 0.92));
+      }catch(e){ resolve(null); }
+    };
+    img.onerror = ()=>resolve(null);
+    img.src = url;
+  });
+}
+
 async function makeCardBlob(){
   if(typeof html2canvas === "undefined") throw new Error("no html2canvas");
   await waitCardImg();
@@ -751,9 +785,7 @@ async function makeCardBlob(){
   const clone = src.cloneNode(true);
   clone.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
   clone.removeAttribute("id");
-  clone.style.cssText += ";position:fixed;left:-10000px;top:0;width:"+CARD_W+"px;height:"+CARD_H+"px;aspect-ratio:auto;border-radius:0;box-shadow:none;font-size:"+(CARD_W/30)+"px;";
-  // === ชดเชยความสว่าง: html2canvas ไม่รองรับ filter:brightness() ===
-  // วาดรูปพื้นหลังลง canvas พร้อมเพิ่มความสว่างเอง แล้วใช้เป็น background ของ clone
+  clone.style.cssText += ";position:fixed;left:-10000px;top:0;width:"+CARD_W+"px;min-width:0;height:"+CARD_H+"px;aspect-ratio:auto;border-radius:0;box-shadow:none;margin:0;font-size:"+(CARD_W/30)+"px;";
   try{
     const srcImgEl = src.querySelector(".vc-img");
     const cloneImgEl = clone.querySelector(".vc-img");
@@ -761,9 +793,13 @@ async function makeCardBlob(){
     const mm = bg.match(/url\(['"]?([^'"\)]+)['"]?\)/);
     if(mm && cloneImgEl){
       const brightened = await brightenImage(mm[1], 1.32, 1.06, 1.08);
+      cloneImgEl.style.filter = "none";
       if(brightened){
         cloneImgEl.style.backgroundImage = "url('"+brightened+"')";
-        cloneImgEl.style.filter = "none";   // ปิด filter เดิมที่ html2canvas อ่านไม่ได้
+      } else {
+        const lift = document.createElement("div");
+        lift.style.cssText = "position:absolute;inset:0;background:rgba(255,255,255,.14)";
+        cloneImgEl.appendChild(lift);
       }
     }
   }catch(e){}
